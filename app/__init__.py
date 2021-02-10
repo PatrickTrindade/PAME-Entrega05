@@ -21,10 +21,13 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
-    migrate.init_app(app)
+    migrate.init_app(app,db)
 
     app.register_blueprint(pet_api)
+    app.register_blueprint(produtos_api)
     app.register_blueprint(servico_api)
+    app.register_blueprint(usuario_api)
+    app.register_blueprint(van_api)
 
 
     return app

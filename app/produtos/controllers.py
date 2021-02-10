@@ -1,55 +1,66 @@
 from flask import request, Blueprint, jsonify
-from app.servico.model import Servico
+from app.produto.model import Produto
 from app.extensions import db
 
-servico_api = Blueprint('servico_api', __name__) # armazena as rotas
+produto_api = Blueprint('produto_api', __name__) # armazena as rotas
 
-@servico_api.route('/servicos', methods=['GET', 'POST'])
+@produto_api.route('/produto', methods=['GET', 'POST'])
 def index():
     if (request.method == 'GET'):
-        servicos = Servico.query.all()   # pega todos os servicos
+        produtos = Produto.query.all()   # pega todos os produtos
 
-        return jsonify([servicos.json() for servico in servicos]), 200
+        return jsonify([produto.json() for produto in produtos]), 200
 
     if (request.method == 'POST'):
         dados = request.json
         
         nome = dados.get('nome')
-        horario = dados.get('horario')
         descricao = dados.get('descricao')
+        qnt_estoque = dados.get('qnt_estoque')
 
-        if(not True):
-            return {'erro' : 'servico, horario ou descrição inválidos'}
+        if (nome is None):
+            return {'erro' : 'O produto exige um nome'}, 400
+
+        if(not isinstance(nome, str) or not isinstance(descricao, str) or not isinstance(qnt_estoque, int)):
+            return {'erro' : 'nome, descricao, ou qnt_estoque inválidos'}, 400
         
-        servico = Servico(nome = nome, horario = horario, descricao = descricao )
+        produto = Produto(nome = nome, descricao = descricao, qnt_estoque = qnt_estoque)
         
-        db.session.add(servico) # não salva ainda, apenas 'coloca na fila' para ser salvo
+        db.session.add(produto) # não salva ainda, apenas 'coloca na fila' para ser salvo
 
         db.session.commit() # salva no banco oq foi add na 'fila'
 
-        return servico.json(), 200
+        return produto.json(), 200
 
-    
 
-'''
-@servico_api.route('/servicos/<int:id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
-def pagina_servico(id):
-    servico = Servico.query.get_or_404(id) #se existir o servico retorna os dados, caso contrário sai da função retornando 404
+@produto_api.route('/produto/<int:id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+def pagina_produto(id):
+    produto = Produto.query.get_or_404(id) #se existir o produto retorna os dados, caso contrário sai da função retornando 404
 
     if (request.method == 'GET'):
-        return servico.json(), 200
+        return produto.json(), 200
 
-    if (request.method == 'PATCH'):
-        dados = request.json()
+    if (request.method == 'PATCH' or 'PUT'):
+        dados = request.json
 
-        nome = dados.get('servico', servico.nome) # 2º param -> oq acontece se não encontrar o parametro (nesse caso 'nome')
-        horario = dados.get('horario', servico.horario)
-        descricao = dados.get('descricao', servico.descricao)
+        nome = dados.get('nome', produto.nome)
+        descricao = dados.get('descricao', produto.descricao)
+        qnt_estoque = dados.get('qnt_estoque', produto.qnt_estoque)
 
-    # verificar se peso e nome estão do jeito certo str//int, em tamanho apropriado...
+        if(not isinstance(nome, str) or not isinstance(descricao, str) or not isinstance(qnt_estoque, int) 
+        or len(nome) > 63 or len(descricao) > 127):
 
-    servico.nome = nome
+            return {"erro" : "nome, raca, porte ou data de nascimento em formato invalido"}
+
+        produto.nome = nome
+        produto.descricao = descricao
+        produto.qnt_estoque = qnt_estoque
+
+        db.session.add(produto)
+
+    if (request.method == 'DELETE'):
+        #db.session.delete(produto)
+        return {"erro" : "recurso ainda nao disponivel"}
 
     db.session.commit() # executa no banco todas as tarefas que estavam na fila
-    return servico.json(), 200
-'''
+    return produto.json(), 200

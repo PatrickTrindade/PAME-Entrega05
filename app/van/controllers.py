@@ -1,55 +1,68 @@
 from flask import request, Blueprint, jsonify
-from app.servico.model import Servico
+from app.van.model import Van
 from app.extensions import db
 
-servico_api = Blueprint('servico_api', __name__) # armazena as rotas
+van_api = Blueprint('van_api', __name__) # armazena as rotas
 
-@servico_api.route('/servicos', methods=['GET', 'POST'])
+@van_api.route('/van', methods=['GET', 'POST'])
 def index():
     if (request.method == 'GET'):
-        servicos = Servico.query.all()   # pega todos os servicos
+        vans = Van.query.all()   # pega todos os vans
 
-        return jsonify([servicos.json() for servico in servicos]), 200
+        return jsonify([van.json() for van in vans]), 200
 
     if (request.method == 'POST'):
         dados = request.json
         
-        nome = dados.get('nome')
         horario = dados.get('horario')
+        id_pet = dados.get('id_pet')
         descricao = dados.get('descricao')
 
-        if(not True):
-            return {'erro' : 'servico, horario ou descrição inválidos'}
+        if (horario is None):
+            return {'erro' : 'O campo de horario é obrigatório'}, 400
+
+        if(not isinstance(horario, str) or not isinstance(id_pet, int) or not isinstance(descricao, str)
+        or len(horario) > 20 or len(descricao) > 127):
+
+            return {'erro' : 'horario, id_pet, porte, ou descricao inválidos'}, 400
         
-        servico = Servico(nome = nome, horario = horario, descricao = descricao )
+        van = Van(horario = horario, id_pet = id_pet, descricao = descricao)
         
-        db.session.add(servico) # não salva ainda, apenas 'coloca na fila' para ser salvo
+        db.session.add(van) # não salva ainda, apenas 'coloca na fila' para ser salvo
 
         db.session.commit() # salva no banco oq foi add na 'fila'
 
-        return servico.json(), 200
+        return van.json(), 200
 
-    
 
-'''
-@servico_api.route('/servicos/<int:id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
-def pagina_servico(id):
-    servico = Servico.query.get_or_404(id) #se existir o servico retorna os dados, caso contrário sai da função retornando 404
+@van_api.route('/van/<int:id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+def pagina_van(id):
+    van = Van.query.get_or_404(id) #se existir o van retorna os dados, caso contrário sai da função retornando 404
 
     if (request.method == 'GET'):
-        return servico.json(), 200
+        return van.json(), 200
 
-    if (request.method == 'PATCH'):
-        dados = request.json()
+    if (request.method == 'PATCH' or 'PUT'):
+        dados = request.json
 
-        nome = dados.get('servico', servico.nome) # 2º param -> oq acontece se não encontrar o parametro (nesse caso 'nome')
-        horario = dados.get('horario', servico.horario)
-        descricao = dados.get('descricao', servico.descricao)
+        horario = dados.get('horario', van.horario)
+        id_pet = dados.get('id_pet', van.id_pet)
+        descricao = dados.get('descricao', van.descricao)
 
-    # verificar se peso e nome estão do jeito certo str//int, em tamanho apropriado...
+        if(not isinstance(horario, str) or not isinstance(id_pet, int) or not isinstance(descricao, str)
+        or len(horario) > 20 or len(descricao) > 127):
+        
+            return {'erro' : 'horario, id_pet, porte, ou descricao inválidos'}, 400
 
-    servico.nome = nome
+        van.horario = horario
+        van.id_pet = id_pet
+        van.descricao = descricao
+
+        db.session.add(van)
+
+    if (request.method == 'DELETE'):
+        #db.session.delete(van)
+        return {"erro" : "recurso ainda nao disponivel"}
 
     db.session.commit() # executa no banco todas as tarefas que estavam na fila
-    return servico.json(), 200
-'''
+    return van.json(), 200

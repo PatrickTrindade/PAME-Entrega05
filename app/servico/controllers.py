@@ -16,12 +16,18 @@ def index():
         
         nome = dados.get('nome')
         horario = dados.get('horario')
+        pet_id = dados.get('pet_id')
         descricao = dados.get('descricao')
 
-        if(not True):
-            return {'erro' : 'servico, horario ou descrição inválidos'}
+        if (raca is None or horario is None):
+            return {'erro' : 'Falta um campo obrigatorio nome ou horario'}, 400
+
+        if(not isinstance(nome, str) or not isinstance(horario, str) or not isinstance(pet_id, int) or not isinstance(descricao,str) 
+        or len(nome) > 63 or len(horario) > 20 or len(descricao) > 127 ):
+
+            return {"erro" : "nome, raca, porte ou data de nascimento em formato invalido"}, 400
         
-        servico = Servico(nome = nome, horario = horario, descricao = descricao )
+        servico = Servico(nome = nome, horario = horario, pet_id = pet_id, descricao = descricao)
         
         db.session.add(servico) # não salva ainda, apenas 'coloca na fila' para ser salvo
 
@@ -29,27 +35,37 @@ def index():
 
         return servico.json(), 200
 
-    
 
-'''
-@servico_api.route('/servicos/<int:id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+@servico_api.route('/servico/<int:id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 def pagina_servico(id):
     servico = Servico.query.get_or_404(id) #se existir o servico retorna os dados, caso contrário sai da função retornando 404
 
     if (request.method == 'GET'):
         return servico.json(), 200
 
-    if (request.method == 'PATCH'):
-        dados = request.json()
+    if (request.method == 'PATCH' or 'PUT'):
+        dados = request.json
 
-        nome = dados.get('servico', servico.nome) # 2º param -> oq acontece se não encontrar o parametro (nesse caso 'nome')
-        horario = dados.get('horario', servico.horario)
-        descricao = dados.get('descricao', servico.descricao)
+        nome = dados.get('nome', servico.nome)
+        horario = dados.get('raca', servico.horario)
+        pet_id = dados.get('porte', servico.pet_id)
+        descricao = dados.get('data_nascimento', servico.descricao)
 
-    # verificar se peso e nome estão do jeito certo str//int, em tamanho apropriado...
+        if(not isinstance(nome, str) or not isinstance(horario, str) or not isinstance(pet_id, int) or not isinstance(descricao,str) 
+        or len(nome) > 63 or len(horario) > 20 or len(descricao) > 127 ):
 
-    servico.nome = nome
+            return {"erro" : "nome, raca, porte ou data de nascimento em formato invalido"}, 400
+
+        servico.nome = nome
+        servico.horario = horario
+        servico.pet_id = pet_id
+        servico.descricao = descricao
+
+        db.session.add(servico)
+
+    if (request.method == 'DELETE'):
+        #db.session.delete(servico)
+        return {"erro" : "recurso ainda nao disponivel"}
 
     db.session.commit() # executa no banco todas as tarefas que estavam na fila
     return servico.json(), 200
-'''

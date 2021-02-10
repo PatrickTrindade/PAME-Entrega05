@@ -6,7 +6,7 @@ class Servico(db.Model):
     nome                    = db.Column(db.String(63), nullable=False)  # banho / tosa
     horario                 = db.Column(db.String(20), nullable=False)  # timestamp
     pet_id                  = db.Column(db.Integer, db.ForeignKey('pet.id'))
-    descricao               = db.Column(db.String(63), default="")
+    descricao               = db.Column(db.String(127), default="")
         
     pet                     = db.relationship("Pet", backref="servico")
 
