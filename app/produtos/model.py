@@ -7,3 +7,10 @@ class Produto(db.Model):
     descricao               = db.Column(db.String(127), default="")
     qnt_estoque             = db.Column(db.Integer, default=0)
     
+    def json(self):
+        return {
+            'id': self.id,
+            'nome': self.nome,
+            'descricao': self.descricao,
+            'qnt_estoque': self.qnt_estoque
+        }

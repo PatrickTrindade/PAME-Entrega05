@@ -1,5 +1,5 @@
 from flask import request, Blueprint, jsonify
-from app.produto.model import Produto
+from app.produtos.model import Produto
 from app.extensions import db
 
 produto_api = Blueprint('produto_api', __name__) # armazena as rotas
@@ -15,13 +15,14 @@ def index():
         dados = request.json
         
         nome = dados.get('nome')
-        descricao = dados.get('descricao')
-        qnt_estoque = dados.get('qnt_estoque')
+        descricao = dados.get('descricao', "")
+        qnt_estoque = dados.get('qnt_estoque', 0)
 
         if (nome is None):
             return {'erro' : 'O produto exige um nome'}, 400
 
-        if(not isinstance(nome, str) or not isinstance(descricao, str) or not isinstance(qnt_estoque, int)):
+        if(not isinstance(nome, str) or not isinstance(descricao, str) or not isinstance(qnt_estoque, int)
+        or len(nome) > 63 or len(descricao) > 127):
             return {'erro' : 'nome, descricao, ou qnt_estoque inválidos'}, 400
         
         produto = Produto(nome = nome, descricao = descricao, qnt_estoque = qnt_estoque)

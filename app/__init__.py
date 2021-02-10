@@ -3,7 +3,7 @@ from .config import Config
 from .extensions import db, migrate
 
 from app.pet.controllers import pet_api
-from app.produtos.controllers import produtos_api
+from app.produtos.controllers import produto_api
 from app.servico.controllers import servico_api
 from app.usuario.controllers import usuario_api
 from app.van.controllers import van_api
@@ -24,7 +24,7 @@ def create_app():
     migrate.init_app(app,db)
 
     app.register_blueprint(pet_api)
-    app.register_blueprint(produtos_api)
+    app.register_blueprint(produto_api)
     app.register_blueprint(servico_api)
     app.register_blueprint(usuario_api)
     app.register_blueprint(van_api)

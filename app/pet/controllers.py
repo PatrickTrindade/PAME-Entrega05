@@ -14,7 +14,7 @@ def index():
     if (request.method == 'POST'):
         dados = request.json
         
-        nome = dados.get('nome')
+        nome = dados.get('nome', "")
         raca = dados.get('raca')
         porte = dados.get('porte')
         data_nascimento = dados.get('data_nascimento')

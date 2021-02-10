@@ -16,16 +16,16 @@ def index():
         
         nome = dados.get('nome')
         horario = dados.get('horario')
-        pet_id = dados.get('pet_id')
-        descricao = dados.get('descricao')
+        pet_id = dados.get('pet_id', 0)
+        descricao = dados.get('descricao', "")
 
-        if (raca is None or horario is None):
-            return {'erro' : 'Falta um campo obrigatorio nome ou horario'}, 400
+        if (nome is None or horario is None or pet_id is None or descricao is None):
+            return {'erro' : 'Falta um campo obrigatorio: nome ou horario'}, 400
 
         if(not isinstance(nome, str) or not isinstance(horario, str) or not isinstance(pet_id, int) or not isinstance(descricao,str) 
         or len(nome) > 63 or len(horario) > 20 or len(descricao) > 127 ):
 
-            return {"erro" : "nome, raca, porte ou data de nascimento em formato invalido"}, 400
+            return {"erro" : "nome, horario, pet_id ou descricao em formato invalido"}, 400
         
         servico = Servico(nome = nome, horario = horario, pet_id = pet_id, descricao = descricao)
         
@@ -47,14 +47,14 @@ def pagina_servico(id):
         dados = request.json
 
         nome = dados.get('nome', servico.nome)
-        horario = dados.get('raca', servico.horario)
-        pet_id = dados.get('porte', servico.pet_id)
-        descricao = dados.get('data_nascimento', servico.descricao)
+        horario = dados.get('horario', servico.horario)
+        pet_id = dados.get('pet_id', servico.pet_id)
+        descricao = dados.get('descricao', servico.descricao)
 
         if(not isinstance(nome, str) or not isinstance(horario, str) or not isinstance(pet_id, int) or not isinstance(descricao,str) 
         or len(nome) > 63 or len(horario) > 20 or len(descricao) > 127 ):
 
-            return {"erro" : "nome, raca, porte ou data de nascimento em formato invalido"}, 400
+            return {"erro" : "nome, horario, pet_id ou descricao em formato invalido"}, 400
 
         servico.nome = nome
         servico.horario = horario

@@ -15,16 +15,16 @@ def index():
         dados = request.json
         
         horario = dados.get('horario')
-        id_pet = dados.get('id_pet')
-        descricao = dados.get('descricao')
+        id_pet = dados.get('id_pet', 0)
+        descricao = dados.get('descricao', "")
 
         if (horario is None):
             return {'erro' : 'O campo de horario é obrigatório'}, 400
 
-        if(not isinstance(horario, str) or not isinstance(id_pet, int) or not isinstance(descricao, str)
+        if(not isinstance(horario, str) or not isinstance(id_pet, int) or not isinstance(descricao, str) 
         or len(horario) > 20 or len(descricao) > 127):
 
-            return {'erro' : 'horario, id_pet, porte, ou descricao inválidos'}, 400
+            return {'erro' : 'horario, id_pet, ou descricao inválidos'}, 400
         
         van = Van(horario = horario, id_pet = id_pet, descricao = descricao)
         
@@ -52,7 +52,7 @@ def pagina_van(id):
         if(not isinstance(horario, str) or not isinstance(id_pet, int) or not isinstance(descricao, str)
         or len(horario) > 20 or len(descricao) > 127):
         
-            return {'erro' : 'horario, id_pet, porte, ou descricao inválidos'}, 400
+            return {'erro' : 'horario, id_pet, ou descricao inválidos'}, 400
 
         van.horario = horario
         van.id_pet = id_pet

@@ -11,3 +11,11 @@ class Usuario(db.Model):
 
     pets                    = db.relationship("Pet", backref="usuario")
 
+    def json(self):
+        return{
+            "username": self.username,
+            "senha": self.senha,
+            "nome": self.nome,
+            "endereco": self.endereco,
+            "email": self.email
+        }
